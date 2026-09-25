@@ -1,1 +1,1963 @@
-templates/index.html
+```html
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI Assistant</title>
+
+<style>
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+:root {
+    --bg: #0b0f19;
+    --sidebar: #080c14;
+    --panel: #111827;
+    --panel2: #151c2b;
+    --border: rgba(255,255,255,.08);
+    --text: #f5f7fb;
+    --muted: #9ca8ba;
+    --accent: #7c5cff;
+    --accent2: #5b8cff;
+    --danger: #ef4444;
+}
+
+body {
+    font-family:
+        Arial,
+        "Segoe UI",
+        Tahoma,
+        sans-serif;
+
+    background:
+        radial-gradient(circle at top left, rgba(124,92,255,.15), transparent 35%),
+        radial-gradient(circle at bottom right, rgba(91,140,255,.10), transparent 30%),
+        var(--bg);
+
+    color: var(--text);
+    min-height: 100vh;
+    overflow: hidden;
+}
+
+/* =========================
+   APP
+========================= */
+
+.app {
+    display: flex;
+    height: 100vh;
+    width: 100%;
+}
+
+/* =========================
+   SIDEBAR
+========================= */
+
+.sidebar {
+    width: 280px;
+    background: rgba(8,12,20,.96);
+    border-left: 1px solid var(--border);
+    display: flex;
+    flex-direction: column;
+    padding: 15px;
+    transition: .3s;
+    z-index: 20;
+}
+
+.logo {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 10px;
+    margin-bottom: 18px;
+}
+
+.logo-icon {
+    width: 42px;
+    height: 42px;
+    border-radius: 13px;
+
+    background:
+        linear-gradient(135deg, var(--accent), var(--accent2));
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    font-size: 21px;
+    font-weight: bold;
+
+    box-shadow:
+        0 8px 30px rgba(124,92,255,.3);
+}
+
+.logo-text {
+    font-size: 19px;
+    font-weight: 800;
+}
+
+.logo-sub {
+    font-size: 11px;
+    color: var(--muted);
+    margin-top: 3px;
+}
+
+.new-chat {
+    border: 1px solid var(--border);
+    background: linear-gradient(
+        135deg,
+        rgba(124,92,255,.18),
+        rgba(91,140,255,.10)
+    );
+
+    color: white;
+    border-radius: 13px;
+    padding: 13px;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: bold;
+    margin-bottom: 15px;
+    transition: .2s;
+}
+
+.new-chat:hover {
+    transform: translateY(-1px);
+    background: rgba(124,92,255,.25);
+}
+
+.section-title {
+    color: var(--muted);
+    font-size: 11px;
+    margin: 15px 8px 8px;
+}
+
+.history {
+    flex: 1;
+    overflow-y: auto;
+}
+
+.chat-item {
+    padding: 11px;
+    border-radius: 10px;
+    margin-bottom: 5px;
+    color: #d7dce6;
+    cursor: pointer;
+    font-size: 13px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.chat-item:hover,
+.chat-item.active {
+    background: rgba(255,255,255,.06);
+}
+
+.sidebar-bottom {
+    border-top: 1px solid var(--border);
+    padding-top: 12px;
+}
+
+.sidebar-button {
+    width: 100%;
+    background: transparent;
+    color: #dce1eb;
+    border: 0;
+    padding: 11px;
+    text-align: right;
+    border-radius: 10px;
+    cursor: pointer;
+    margin-bottom: 3px;
+}
+
+.sidebar-button:hover {
+    background: rgba(255,255,255,.05);
+}
+
+/* =========================
+   MAIN
+========================= */
+
+.main {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+}
+
+/* =========================
+   HEADER
+========================= */
+
+.header {
+    height: 65px;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 22px;
+
+    backdrop-filter: blur(20px);
+    background: rgba(11,15,25,.72);
+}
+
+.header-left {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.mobile-menu {
+    display: none;
+    background: transparent;
+    border: 0;
+    color: white;
+    font-size: 22px;
+    cursor: pointer;
+}
+
+.model-selector {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    cursor: pointer;
+    padding: 9px 12px;
+    border-radius: 10px;
+}
+
+.model-selector:hover {
+    background: rgba(255,255,255,.05);
+}
+
+.model-name {
+    font-weight: bold;
+}
+
+.model-status {
+    width: 7px;
+    height: 7px;
+    background: #31d17c;
+    border-radius: 50%;
+}
+
+.header-actions {
+    display: flex;
+    gap: 8px;
+}
+
+.icon-button {
+    width: 38px;
+    height: 38px;
+    background: transparent;
+    color: #dce1eb;
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    cursor: pointer;
+}
+
+.icon-button:hover {
+    background: rgba(255,255,255,.06);
+}
+
+/* =========================
+   CHAT AREA
+========================= */
+
+.chat-area {
+    flex: 1;
+    overflow-y: auto;
+    padding: 40px 20px 160px;
+}
+
+.chat-container {
+    max-width: 900px;
+    margin: auto;
+}
+
+/* =========================
+   WELCOME
+========================= */
+
+.welcome {
+    min-height: 60vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    text-align: center;
+}
+
+.welcome-icon {
+    width: 80px;
+    height: 80px;
+    border-radius: 25px;
+
+    background:
+        linear-gradient(
+            135deg,
+            #7c5cff,
+            #4f8cff
+        );
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    font-size: 36px;
+    margin-bottom: 20px;
+
+    box-shadow:
+        0 20px 60px rgba(124,92,255,.25);
+}
+
+.welcome h1 {
+    font-size: 36px;
+    margin-bottom: 12px;
+}
+
+.welcome p {
+    color: var(--muted);
+    max-width: 600px;
+    line-height: 1.8;
+}
+
+/* =========================
+   SUGGESTIONS
+========================= */
+
+.suggestions {
+    display: grid;
+    grid-template-columns: repeat(2,1fr);
+    gap: 12px;
+    margin-top: 35px;
+    width: 100%;
+}
+
+.suggestion {
+    padding: 17px;
+    border: 1px solid var(--border);
+    background: rgba(255,255,255,.025);
+    border-radius: 15px;
+    cursor: pointer;
+    text-align: right;
+    transition: .2s;
+}
+
+.suggestion:hover {
+    background: rgba(124,92,255,.08);
+    border-color: rgba(124,92,255,.3);
+    transform: translateY(-2px);
+}
+
+.suggestion-icon {
+    font-size: 21px;
+    margin-bottom: 8px;
+}
+
+.suggestion-title {
+    font-weight: bold;
+    font-size: 14px;
+}
+
+.suggestion-desc {
+    font-size: 12px;
+    color: var(--muted);
+    margin-top: 5px;
+}
+
+/* =========================
+   MESSAGES
+========================= */
+
+.message {
+    display: flex;
+    gap: 14px;
+    margin-bottom: 28px;
+    animation: fadeIn .25s ease;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(8px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.avatar {
+    width: 36px;
+    height: 36px;
+    border-radius: 11px;
+    flex-shrink: 0;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    font-size: 15px;
+    font-weight: bold;
+}
+
+.user-avatar {
+    background: #252c3a;
+}
+
+.ai-avatar {
+    background:
+        linear-gradient(135deg,#7c5cff,#5b8cff);
+}
+
+.message-content {
+    flex: 1;
+    min-width: 0;
+}
+
+.message-name {
+    font-size: 12px;
+    color: var(--muted);
+    margin-bottom: 7px;
+}
+
+.message-text {
+    line-height: 1.85;
+    white-space: pre-wrap;
+    font-size: 15px;
+}
+
+.message-actions {
+    display: flex;
+    gap: 5px;
+    margin-top: 10px;
+}
+
+.message-action {
+    background: transparent;
+    border: 0;
+    color: #7f8a9e;
+    cursor: pointer;
+    padding: 5px 7px;
+    border-radius: 6px;
+}
+
+.message-action:hover {
+    background: rgba(255,255,255,.06);
+    color: white;
+}
+
+/* =========================
+   TYPING
+========================= */
+
+.typing {
+    display: flex;
+    gap: 5px;
+    padding: 10px 0;
+}
+
+.typing span {
+    width: 7px;
+    height: 7px;
+    background: #8993a6;
+    border-radius: 50%;
+    animation: typing 1.2s infinite;
+}
+
+.typing span:nth-child(2) {
+    animation-delay: .15s;
+}
+
+.typing span:nth-child(3) {
+    animation-delay: .3s;
+}
+
+@keyframes typing {
+    0%,60%,100% {
+        transform: translateY(0);
+        opacity: .4;
+    }
+
+    30% {
+        transform: translateY(-5px);
+        opacity: 1;
+    }
+}
+
+/* =========================
+   COMPOSER
+========================= */
+
+.composer-wrapper {
+    position: fixed;
+    bottom: 0;
+    left: 280px;
+    right: 0;
+
+    padding: 18px 20px 22px;
+
+    background:
+        linear-gradient(
+            transparent,
+            rgba(11,15,25,.92) 30%
+        );
+
+    backdrop-filter: blur(10px);
+}
+
+.composer {
+    max-width: 900px;
+    margin: auto;
+
+    border: 1px solid rgba(255,255,255,.12);
+    background: rgba(20,27,40,.94);
+
+    border-radius: 20px;
+    padding: 10px;
+
+    box-shadow:
+        0 15px 50px rgba(0,0,0,.35);
+}
+
+.input-row {
+    display: flex;
+    align-items: flex-end;
+    gap: 8px;
+}
+
+textarea {
+    flex: 1;
+    resize: none;
+    border: 0;
+    outline: none;
+    background: transparent;
+    color: white;
+    font-family: inherit;
+    font-size: 15px;
+    line-height: 1.6;
+    padding: 9px;
+    min-height: 45px;
+    max-height: 160px;
+}
+
+textarea::placeholder {
+    color: #788398;
+}
+
+.composer-bottom {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 5px 5px 2px;
+}
+
+.tools {
+    display: flex;
+    gap: 5px;
+}
+
+.tool {
+    border: 0;
+    background: transparent;
+    color: #a6afbe;
+    cursor: pointer;
+    padding: 8px 9px;
+    border-radius: 8px;
+    font-size: 13px;
+}
+
+.tool:hover {
+    background: rgba(255,255,255,.06);
+    color: white;
+}
+
+.send-button {
+    width: 42px;
+    height: 42px;
+    border: 0;
+    border-radius: 12px;
+
+    background:
+        linear-gradient(
+            135deg,
+            var(--accent),
+            var(--accent2)
+        );
+
+    color: white;
+    cursor: pointer;
+    font-size: 18px;
+
+    transition: .2s;
+}
+
+.send-button:hover {
+    transform: scale(1.04);
+}
+
+.send-button:disabled {
+    opacity: .45;
+    cursor: not-allowed;
+}
+
+/* =========================
+   MODAL
+========================= */
+
+.modal-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,.65);
+    backdrop-filter: blur(7px);
+
+    display: none;
+    align-items: center;
+    justify-content: center;
+
+    z-index: 100;
+}
+
+.modal-overlay.active {
+    display: flex;
+}
+
+.modal {
+    width: min(500px, calc(100% - 30px));
+    background: #111827;
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    padding: 22px;
+    box-shadow: 0 30px 100px rgba(0,0,0,.5);
+}
+
+.modal-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 20px;
+}
+
+.modal-header h2 {
+    font-size: 19px;
+}
+
+.close {
+    border: 0;
+    background: transparent;
+    color: #aab2c1;
+    font-size: 20px;
+    cursor: pointer;
+}
+
+.modal-option {
+    border: 1px solid var(--border);
+    padding: 14px;
+    border-radius: 13px;
+    margin-bottom: 9px;
+    cursor: pointer;
+}
+
+.modal-option:hover {
+    background: rgba(255,255,255,.05);
+}
+
+.modal-option strong {
+    display: block;
+    margin-bottom: 4px;
+}
+
+.modal-option small {
+    color: var(--muted);
+}
+
+/* =========================
+   IMAGE / VIDEO MODE
+========================= */
+
+.creation-panel {
+    max-width: 700px;
+    margin: auto;
+}
+
+.creation-card {
+    background: rgba(255,255,255,.025);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    padding: 25px;
+}
+
+.creation-title {
+    font-size: 24px;
+    font-weight: bold;
+    margin-bottom: 8px;
+}
+
+.creation-subtitle {
+    color: var(--muted);
+    margin-bottom: 22px;
+}
+
+.creation-input {
+    width: 100%;
+    background: #0c111c;
+    color: white;
+    border: 1px solid var(--border);
+    border-radius: 13px;
+    padding: 15px;
+    outline: none;
+    font-family: inherit;
+    resize: vertical;
+    min-height: 120px;
+}
+
+.creation-input:focus {
+    border-color: rgba(124,92,255,.5);
+}
+
+.creation-button {
+    width: 100%;
+    margin-top: 12px;
+    padding: 13px;
+    border: 0;
+    border-radius: 12px;
+    background: linear-gradient(135deg,#7c5cff,#5b8cff);
+    color: white;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+/* =========================
+   TOAST
+========================= */
+
+.toast {
+    position: fixed;
+    bottom: 100px;
+    left: 50%;
+    transform: translateX(-50%) translateY(20px);
+
+    background: #1d2636;
+    color: white;
+
+    padding: 12px 18px;
+    border-radius: 12px;
+
+    opacity: 0;
+    pointer-events: none;
+
+    transition: .3s;
+    z-index: 200;
+}
+
+.toast.show {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+}
+
+/* =========================
+   RESPONSIVE
+========================= */
+
+@media(max-width:800px) {
+
+    .sidebar {
+        position: fixed;
+        top: 0;
+        bottom: 0;
+        right: 0;
+        transform: translateX(100%);
+        box-shadow: -20px 0 50px rgba(0,0,0,.4);
+    }
+
+    .sidebar.open {
+        transform: translateX(0);
+    }
+
+    .mobile-menu {
+        display: block;
+    }
+
+    .composer-wrapper {
+        left: 0;
+    }
+
+    .suggestions {
+        grid-template-columns: 1fr;
+    }
+
+    .welcome h1 {
+        font-size: 28px;
+    }
+}
+
+@media(max-width:500px) {
+
+    .chat-area {
+        padding-left: 12px;
+        padding-right: 12px;
+    }
+
+    .header {
+        padding: 0 12px;
+    }
+
+    .composer-wrapper {
+        padding-left: 10px;
+        padding-right: 10px;
+    }
+
+    .tool span {
+        display: none;
+    }
+}
+</style>
+</head>
+
+<body>
+
+<div class="app">
+
+    <!-- ================= SIDEBAR ================= -->
+
+    <aside class="sidebar" id="sidebar">
+
+        <div class="logo">
+
+            <div class="logo-icon">
+                AI
+            </div>
+
+            <div>
+                <div class="logo-text">
+                    AI Assistant
+                </div>
+
+                <div class="logo-sub">
+                    Your intelligent assistant
+                </div>
+            </div>
+
+        </div>
+
+        <button class="new-chat" onclick="newChat()">
+            ＋ محادثة جديدة
+        </button>
+
+        <div class="section-title">
+            المحادثات
+        </div>
+
+        <div class="history" id="history">
+
+            <div class="chat-item active">
+                محادثة جديدة
+            </div>
+
+        </div>
+
+        <div class="sidebar-bottom">
+
+            <button class="sidebar-button" onclick="openSettings()">
+                ⚙️ الإعدادات
+            </button>
+
+            <button class="sidebar-button" onclick="showAbout()">
+                ℹ️ حول المساعد
+            </button>
+
+        </div>
+
+    </aside>
+
+
+    <!-- ================= MAIN ================= -->
+
+    <main class="main">
+
+        <header class="header">
+
+            <div class="header-left">
+
+                <button
+                    class="mobile-menu"
+                    onclick="toggleSidebar()">
+                    ☰
+                </button>
+
+                <div
+                    class="model-selector"
+                    onclick="openModels()">
+
+                    <span class="model-status"></span>
+
+                    <span class="model-name">
+                        AI Assistant
+                    </span>
+
+                    <span>
+                        ▾
+                    </span>
+
+                </div>
+
+            </div>
+
+            <div class="header-actions">
+
+                <button
+                    class="icon-button"
+                    title="إنشاء صورة"
+                    onclick="openImageCreator()">
+                    🖼️
+                </button>
+
+                <button
+                    class="icon-button"
+                    title="إنشاء فيديو"
+                    onclick="openVideoCreator()">
+                    🎬
+                </button>
+
+            </div>
+
+        </header>
+
+
+        <!-- ================= CHAT ================= -->
+
+        <section class="chat-area" id="chatArea">
+
+            <div class="chat-container" id="chatContainer">
+
+                <div class="welcome" id="welcome">
+
+                    <div class="welcome-icon">
+                        ✦
+                    </div>
+
+                    <h1>
+                        كيف يمكنني مساعدتك؟
+                    </h1>
+
+                    <p>
+                        أنا مساعد ذكاء اصطناعي تجريبي.
+                        يمكنك طرح الأسئلة، طلب كتابة النصوص،
+                        البرمجة، تحليل الأفكار، إنشاء الصور
+                        والفيديوهات من خلال الواجهة.
+                    </p>
+
+                    <div class="suggestions">
+
+                        <div
+                            class="suggestion"
+                            onclick="useSuggestion('اكتب لي فكرة مشروع مبتكر')">
+
+                            <div class="suggestion-icon">
+                                💡
+                            </div>
+
+                            <div class="suggestion-title">
+                                أفكار ومشاريع
+                            </div>
+
+                            <div class="suggestion-desc">
+                                ساعدني في ابتكار فكرة مشروع جديدة
+                            </div>
+
+                        </div>
+
+
+                        <div
+                            class="suggestion"
+                            onclick="useSuggestion('اكتب لي صفحة HTML احترافية')">
+
+                            <div class="suggestion-icon">
+                                💻
+                            </div>
+
+                            <div class="suggestion-title">
+                                البرمجة
+                            </div>
+
+                            <div class="suggestion-desc">
+                                اكتب لي كودًا لموقع احترافي
+                            </div>
+
+                        </div>
+
+
+                        <div
+                            class="suggestion"
+                            onclick="openImageCreator()">
+
+                            <div class="suggestion-icon">
+                                🎨
+                            </div>
+
+                            <div class="suggestion-title">
+                                إنشاء صورة
+                            </div>
+
+                            <div class="suggestion-desc">
+                                اكتب وصفًا للصورة التي تريدها
+                            </div>
+
+                        </div>
+
+
+                        <div
+                            class="suggestion"
+                            onclick="openVideoCreator()">
+
+                            <div class="suggestion-icon">
+                                🎬
+                            </div>
+
+                            <div class="suggestion-title">
+                                إنشاء فيديو
+                            </div>
+
+                            <div class="suggestion-desc">
+                                اكتب فكرة الفيديو الذي تريده
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </section>
+
+
+        <!-- ================= COMPOSER ================= -->
+
+        <div class="composer-wrapper">
+
+            <div class="composer">
+
+                <div class="input-row">
+
+                    <textarea
+                        id="messageInput"
+                        rows="1"
+                        placeholder="اكتب رسالتك هنا..."
+                        oninput="autoResize(this)"
+                        onkeydown="handleKey(event)">
+                    </textarea>
+
+                    <button
+                        class="send-button"
+                        id="sendButton"
+                        onclick="sendMessage()">
+                        ↑
+                    </button>
+
+                </div>
+
+
+                <div class="composer-bottom">
+
+                    <div class="tools">
+
+                        <button
+                            class="tool"
+                            onclick="openImageCreator()">
+                            🖼️ <span>صورة</span>
+                        </button>
+
+                        <button
+                            class="tool"
+                            onclick="openVideoCreator()">
+                            🎬 <span>فيديو</span>
+                        </button>
+
+                        <button
+                            class="tool"
+                            onclick="attachFile()">
+                            📎 <span>ملف</span>
+                        </button>
+
+                    </div>
+
+                    <small style="color:#687386">
+                        AI Assistant
+                    </small>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </main>
+
+</div>
+
+
+<!-- ================= MODALS ================= -->
+
+<div class="modal-overlay" id="modal">
+
+    <div class="modal">
+
+        <div class="modal-header">
+
+            <h2 id="modalTitle">
+                الإعدادات
+            </h2>
+
+            <button
+                class="close"
+                onclick="closeModal()">
+                ×
+            </button>
+
+        </div>
+
+        <div id="modalBody"></div>
+
+    </div>
+
+</div>
+
+
+<div class="toast" id="toast">
+    تم التنفيذ
+</div>
+
+
+<script>
+
+/* =========================================
+   VARIABLES
+========================================= */
+
+const input = document.getElementById("messageInput");
+const chatContainer = document.getElementById("chatContainer");
+const chatArea = document.getElementById("chatArea");
+const welcome = document.getElementById("welcome");
+const sendButton = document.getElementById("sendButton");
+
+let conversation = [];
+
+
+/* =========================================
+   AUTO RESIZE
+========================================= */
+
+function autoResize(element) {
+
+    element.style.height = "auto";
+
+    element.style.height =
+        Math.min(element.scrollHeight, 160) + "px";
+}
+
+
+/* =========================================
+   KEYBOARD
+========================================= */
+
+function handleKey(event) {
+
+    if (
+        event.key === "Enter" &&
+        !event.shiftKey
+    ) {
+
+        event.preventDefault();
+
+        sendMessage();
+    }
+}
+
+
+/* =========================================
+   SEND MESSAGE
+========================================= */
+
+function sendMessage() {
+
+    const text = input.value.trim();
+
+    if (!text) return;
+
+    if (welcome) {
+        welcome.style.display = "none";
+    }
+
+    addMessage(
+        "user",
+        text
+    );
+
+    input.value = "";
+
+    input.style.height = "auto";
+
+    conversation.push({
+        role: "user",
+        content: text
+    });
+
+    simulateAI(text);
+}
+
+
+/* =========================================
+   ADD MESSAGE
+========================================= */
+
+function addMessage(type, text) {
+
+    const message = document.createElement("div");
+
+    message.className = "message";
+
+    const avatar =
+        type === "user"
+        ? "👤"
+        : "✦";
+
+    const name =
+        type === "user"
+        ? "أنت"
+        : "AI Assistant";
+
+    message.innerHTML = `
+
+        <div class="avatar ${
+            type === "user"
+            ? "user-avatar"
+            : "ai-avatar"
+        }">
+            ${avatar}
+        </div>
+
+        <div class="message-content">
+
+            <div class="message-name">
+                ${name}
+            </div>
+
+            <div class="message-text">
+                ${escapeHTML(text)}
+            </div>
+
+            ${
+                type === "ai"
+                ? `
+                <div class="message-actions">
+
+                    <button
+                        class="message-action"
+                        onclick="copyText(this)">
+                        📋 نسخ
+                    </button>
+
+                    <button
+                        class="message-action"
+                        onclick="showToast('تم التقييم')">
+                        👍
+                    </button>
+
+                    <button
+                        class="message-action"
+                        onclick="showToast('تم التقييم')">
+                        👎
+                    </button>
+
+                </div>
+                `
+                : ""
+            }
+
+        </div>
+    `;
+
+    chatContainer.appendChild(message);
+
+    scrollBottom();
+}
+
+
+/* =========================================
+   AI SIMULATION
+========================================= */
+
+function simulateAI(question) {
+
+    const typing =
+        document.createElement("div");
+
+    typing.className = "message";
+
+    typing.id = "typingMessage";
+
+    typing.innerHTML = `
+
+        <div class="avatar ai-avatar">
+            ✦
+        </div>
+
+        <div class="message-content">
+
+            <div class="message-name">
+                AI Assistant
+            </div>
+
+            <div class="typing">
+
+                <span></span>
+                <span></span>
+                <span></span>
+
+            </div>
+
+        </div>
+    `;
+
+    chatContainer.appendChild(typing);
+
+    scrollBottom();
+
+
+    setTimeout(() => {
+
+        typing.remove();
+
+        const answer = generateDemoAnswer(question);
+
+        addMessage(
+            "ai",
+            answer
+        );
+
+        conversation.push({
+            role: "assistant",
+            content: answer
+        });
+
+    }, 1200);
+}
+
+
+/* =========================================
+   DEMO AI RESPONSE
+========================================= */
+
+function generateDemoAnswer(question) {
+
+    const q = question.toLowerCase();
+
+    if (
+        q.includes("html") ||
+        q.includes("كود") ||
+        q.includes("برمجة")
+    ) {
+
+        return `بالتأكيد! أستطيع مساعدتك في البرمجة.
+
+يمكنني مثلًا إنشاء:
+• HTML
+• CSS
+• JavaScript
+• مواقع كاملة
+• صفحات تسجيل دخول
+• لوحات تحكم
+• متاجر إلكترونية
+
+ملاحظة: هذه النسخة تعمل محليًا، ولتحويلها إلى مساعد ذكاء اصطناعي حقيقي يجب ربطها بواجهة API لنموذج ذكاء اصطناعي.`;
+    }
+
+
+    if (
+        q.includes("صورة") ||
+        q.includes("تصميم")
+    ) {
+
+        return `أستطيع تجهيز وصف احترافي للصورة.
+
+مثال:
+"مدينة مستقبلية في الليل، مبانٍ ضخمة مضيئة، سيارات طائرة، إضاءة سينمائية، تفاصيل واقعية جدًا."
+
+لتوليد الصورة فعليًا، يجب ربط زر إنشاء الصور بخدمة توليد صور عبر API.`;
+    }
+
+
+    if (
+        q.includes("فيديو")
+    ) {
+
+        return `يمكنني مساعدتك في إعداد فكرة الفيديو، السيناريو، المشاهد، الحوار، وحركة الكاميرا.
+
+مثال:
+المشهد 1 → لقطة جوية للمدينة.
+المشهد 2 → اقتراب من الشخصية.
+المشهد 3 → ظهور الحدث الرئيسي.
+المشهد 4 → النهاية.
+
+ولإنشاء الفيديو فعليًا تحتاج إلى ربط الموقع بخدمة توليد فيديو.`;
+    }
+
+
+    if (
+        q.includes("مرحبا") ||
+        q.includes("السلام")
+    ) {
+
+        return `أهلًا وسهلًا! 👋
+
+أنا مساعدك الذكي التجريبي.
+
+يمكنك أن تطلب مني:
+• الإجابة عن الأسئلة
+• كتابة الأكواد
+• كتابة النصوص
+• أفكار المشاريع
+• إنشاء أوصاف للصور
+• إنشاء سيناريوهات للفيديو
+• المساعدة في الدراسة`;
+    }
+
+
+    return `فهمت سؤالك:
+
+"${question}"
+
+هذه النسخة من الموقع عبارة عن واجهة ذكاء اصطناعي تعمل داخل المتصفح.
+
+أستطيع في النسخة المتقدمة أن أكون متصلًا بنموذج ذكاء اصطناعي حقيقي، بحيث يتم إرسال سؤالك إلى الخادم والحصول على إجابة حقيقية بدل الرد التجريبي الموجود الآن.
+
+إذا أردت بناء نسخة حقيقية، فالخطوة التالية هي إضافة Backend وAPI.`;
+}
+
+
+/* =========================================
+   SUGGESTION
+========================================= */
+
+function useSuggestion(text) {
+
+    input.value = text;
+
+    autoResize(input);
+
+    input.focus();
+}
+
+
+/* =========================================
+   NEW CHAT
+========================================= */
+
+function newChat() {
+
+    chatContainer.innerHTML = "";
+
+    const newWelcome =
+        document.createElement("div");
+
+    newWelcome.className = "welcome";
+
+    newWelcome.innerHTML = `
+
+        <div class="welcome-icon">
+            ✦
+        </div>
+
+        <h1>
+            كيف يمكنني مساعدتك؟
+        </h1>
+
+        <p>
+            ابدأ محادثة جديدة مع مساعدك الذكي.
+        </p>
+
+    `;
+
+    chatContainer.appendChild(newWelcome);
+
+    conversation = [];
+
+    showToast("تم إنشاء محادثة جديدة");
+}
+
+
+/* =========================================
+   SIDEBAR
+========================================= */
+
+function toggleSidebar() {
+
+    document
+        .getElementById("sidebar")
+        .classList.toggle("open");
+}
+
+
+/* =========================================
+   MODAL
+========================================= */
+
+function openModal(title, body) {
+
+    document.getElementById("modalTitle")
+        .textContent = title;
+
+    document.getElementById("modalBody")
+        .innerHTML = body;
+
+    document.getElementById("modal")
+        .classList.add("active");
+}
+
+
+function closeModal() {
+
+    document.getElementById("modal")
+        .classList.remove("active");
+}
+
+
+/* =========================================
+   MODELS
+========================================= */
+
+function openModels() {
+
+    openModal(
+        "اختيار النموذج",
+        `
+
+        <div
+            class="modal-option"
+            onclick="selectModel('AI Smart')">
+
+            <strong>
+                AI Smart
+            </strong>
+
+            <small>
+                نموذج عام للمحادثة
+            </small>
+
+        </div>
+
+        <div
+            class="modal-option"
+            onclick="selectModel('AI Pro')">
+
+            <strong>
+                AI Pro
+            </strong>
+
+            <small>
+                مناسب للبرمجة والتحليل
+            </small>
+
+        </div>
+
+        <div
+            class="modal-option"
+            onclick="selectModel('AI Creative')">
+
+            <strong>
+                AI Creative
+            </strong>
+
+            <small>
+                مناسب للصور والأفكار والمحتوى
+            </small>
+
+        </div>
+        `
+    );
+}
+
+
+function selectModel(name) {
+
+    document.querySelector(".model-name")
+        .textContent = name;
+
+    closeModal();
+
+    showToast("تم اختيار " + name);
+}
+
+
+/* =========================================
+   SETTINGS
+========================================= */
+
+function openSettings() {
+
+    openModal(
+        "الإعدادات",
+        `
+
+        <div class="modal-option">
+            <strong>
+                اللغة
+            </strong>
+
+            <small>
+                العربية
+            </small>
+        </div>
+
+        <div class="modal-option">
+            <strong>
+                المظهر
+            </strong>
+
+            <small>
+                الوضع الداكن
+            </small>
+        </div>
+
+        <div class="modal-option">
+            <strong>
+                حفظ المحادثات
+            </strong>
+
+            <small>
+                تخزين محلي في المتصفح
+            </small>
+        </div>
+
+        `
+    );
+}
+
+
+/* =========================================
+   ABOUT
+========================================= */
+
+function showAbout() {
+
+    openModal(
+        "حول AI Assistant",
+        `
+
+        <p style="
+            color:#b8c0ce;
+            line-height:1.8;
+        ">
+            هذا المشروع عبارة عن واجهة ويب
+            لمساعد ذكاء اصطناعي.
+
+            <br><br>
+
+            تم بناؤه باستخدام:
+
+            <br>
+
+            HTML + CSS + JavaScript
+
+            <br><br>
+
+            ويمكن لاحقًا ربطه بخدمة AI حقيقية.
+        </p>
+
+        `
+    );
+}
+
+
+/* =========================================
+   IMAGE CREATOR
+========================================= */
+
+function openImageCreator() {
+
+    openModal(
+        "🎨 إنشاء صورة",
+        `
+
+        <div class="creation-card">
+
+            <div class="creation-title">
+                مولد الصور
+            </div>
+
+            <div class="creation-subtitle">
+                اكتب وصف الصورة التي تريد إنشاءها.
+            </div>
+
+            <textarea
+                class="creation-input"
+                id="imagePrompt"
+                placeholder="مثال: مدينة مستقبلية في دبي وقت الغروب، أسلوب سينمائي واقعي جدًا...">
+            </textarea>
+
+            <button
+                class="creation-button"
+                onclick="generateImage()">
+
+                ✨ إنشاء الصورة
+
+            </button>
+
+        </div>
+
+        `
+    );
+}
+
+
+function generateImage() {
+
+    const prompt =
+        document.getElementById("imagePrompt").value.trim();
+
+    if (!prompt) {
+
+        showToast("اكتب وصف الصورة أولًا");
+
+        return;
+    }
+
+    closeModal();
+
+    addMessage(
+        "user",
+        "🎨 إنشاء صورة: " + prompt
+    );
+
+    setTimeout(() => {
+
+        addMessage(
+            "ai",
+            `تم تجهيز طلب الصورة.
+
+الوصف:
+${prompt}
+
+⚠️ هذه النسخة التجريبية لا تحتوي على مولد صور فعلي. يمكنك ربط هذه الوظيفة بـ Image Generation API لإنشاء الصورة فعليًا.`
+        );
+
+    }, 1000);
+}
+
+
+/* =========================================
+   VIDEO CREATOR
+========================================= */
+
+function openVideoCreator() {
+
+    openModal(
+        "🎬 إنشاء فيديو",
+        `
+
+        <div class="creation-card">
+
+            <div class="creation-title">
+                مولد الفيديو
+            </div>
+
+            <div class="creation-subtitle">
+                اكتب وصف الفيديو أو الفكرة.
+            </div>
+
+            <textarea
+                class="creation-input"
+                id="videoPrompt"
+                placeholder="مثال: فيديو سينمائي لسيارة رياضية تسير في شارع مستقبلي ليلًا...">
+            </textarea>
+
+            <button
+                class="creation-button"
+                onclick="generateVideo()">
+
+                🎬 إنشاء الفيديو
+
+            </button>
+
+        </div>
+
+        `
+    );
+}
+
+
+function generateVideo() {
+
+    const prompt =
+        document.getElementById("videoPrompt").value.trim();
+
+    if (!prompt) {
+
+        showToast("اكتب وصف الفيديو أولًا");
+
+        return;
+    }
+
+    closeModal();
+
+    addMessage(
+        "user",
+        "🎬 إنشاء فيديو: " + prompt
+    );
+
+    setTimeout(() => {
+
+        addMessage(
+            "ai",
+            `تم تجهيز سيناريو الفيديو.
+
+الوصف:
+${prompt}
+
+المشاهد المقترحة:
+1. لقطة افتتاحية واسعة.
+2. انتقال سينمائي للمشهد الرئيسي.
+3. حركة الكاميرا حول العنصر الأساسي.
+4. لقطة ختامية.
+
+⚠️ لتوليد الفيديو فعليًا، يجب ربط هذه الوظيفة بخدمة Video Generation API.`
+        );
+
+    }, 1000);
+}
+
+
+/* =========================================
+   ATTACH FILE
+========================================= */
+
+function attachFile() {
+
+    const inputFile =
+        document.createElement("input");
+
+    inputFile.type = "file";
+
+    inputFile.onchange = () => {
+
+        if (inputFile.files.length) {
+
+            showToast(
+                "تم اختيار: " +
+                inputFile.files[0].name
+            );
+        }
+    };
+
+    inputFile.click();
+}
+
+
+/* =========================================
+   COPY
+========================================= */
+
+function copyText(button) {
+
+    const text =
+        button
+        .parentElement
+        .parentElement
+        .querySelector(".message-text")
+        .innerText;
+
+    navigator.clipboard.writeText(text);
+
+    showToast("تم نسخ النص");
+}
+
+
+/* =========================================
+   TOAST
+========================================= */
+
+function showToast(text) {
+
+    const toast =
+        document.getElementById("toast");
+
+    toast.textContent = text;
+
+    toast.classList.add("show");
+
+    setTimeout(() => {
+
+        toast.classList.remove("show");
+
+    }, 2200);
+}
+
+
+/* =========================================
+   SCROLL
+========================================= */
+
+function scrollBottom() {
+
+    setTimeout(() => {
+
+        chatArea.scrollTo({
+            top: chatArea.scrollHeight,
+            behavior: "smooth"
+        });
+
+    }, 50);
+}
+
+
+/* =========================================
+   ESCAPE HTML
+========================================= */
+
+function escapeHTML(text) {
+
+    const div =
+        document.createElement("div");
+
+    div.textContent = text;
+
+    return div.innerHTML;
+}
+
+
+/* =========================================
+   CLOSE MODAL BY CLICKING OUTSIDE
+========================================= */
+
+document
+    .getElementById("modal")
+    .addEventListener(
+        "click",
+        function(event) {
+
+            if (event.target === this) {
+                closeModal();
+            }
+
+        }
+    );
+
+
+/* =========================================
+   INITIALIZATION
+========================================= */
+
+input.focus();
+
+</script>
+
+</body>
+</html>
+```
